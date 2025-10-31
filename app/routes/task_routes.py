@@ -3,10 +3,6 @@ from app.models.task import Task
 from ..db import db
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
-# To do:
-# make helper functions:
-# 1: retrieve a model instance by id
-# 2: handle the creation of new instances of a model from a dictionary, return expected response
 
 def validate_task(task_id):
     try:
@@ -25,15 +21,19 @@ def validate_task(task_id):
 
     return task
 
-
-@tasks_bp.post("")
-def create_task():
-    request_body = request.get_json()
+def create_task_from_dict(request_body):
     title = request_body["title"]
     description = request_body["description"]
     completed_at = request_body.get("completed_at")
 
     new_task = Task(title=title, description=description, completed_at=completed_at)
+
+    return new_task
+
+@tasks_bp.post("")
+def create_task():
+    request_body = request.get_json()
+    new_task = create_task_from_dict(request_body)
 
     db.session.add(new_task)
     db.session.commit()
