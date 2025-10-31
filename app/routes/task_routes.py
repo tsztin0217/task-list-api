@@ -43,3 +43,31 @@ def get_task(task_id):
     tasks_response = task.return_dict()
 
     return tasks_response
+
+@tasks_bp.put("/<task_id>")
+def update_task(task_id):
+    request_body = request.get_json()
+    title = request_body["title"]
+    description = request_body["description"]
+    completed_at = request_body.get("completed_at")
+
+    query = db.select(Task).where(Task.id == task_id)
+    task = db.session.scalar(query)
+
+    task.title = title
+    task.description = description
+    task.completed_at = completed_at
+
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+@tasks_bp.delete("/<task_id>")
+def delete_task(task_id):
+    query = db.Select(Task).where(Task.id == task_id)
+    task = db.session.scalar(query)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
