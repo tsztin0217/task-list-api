@@ -8,6 +8,24 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 # 1: retrieve a model instance by id
 # 2: handle the creation of new instances of a model from a dictionary, return expected response
 
+def validate_task(task_id):
+    try:
+        task_id = int(task_id)
+    except:
+        response = {"message": f"Task {task_id} invalid"}
+
+        abort(make_response(response, 400))
+    
+    query = db.select(Task).where(Task.id == task_id)
+    task = db.session.scalar(query)
+
+    if not task:
+        response = {"message": f"Task {task_id} not found"}
+        abort(make_response(response, 404))
+
+    return task
+
+
 @tasks_bp.post("")
 def create_task():
     request_body = request.get_json()
@@ -36,9 +54,7 @@ def get_all_tasks():
 
 @tasks_bp.get("/<task_id>")
 def get_task(task_id):
-    query = db.select(Task).where(Task.id == task_id)
-
-    task = db.session.scalar(query)
+    task = validate_task(task_id)
 
     tasks_response = task.return_dict()
 
@@ -46,17 +62,13 @@ def get_task(task_id):
 
 @tasks_bp.put("/<task_id>")
 def update_task(task_id):
+    task = validate_task(task_id)
+
     request_body = request.get_json()
-    title = request_body["title"]
-    description = request_body["description"]
-    completed_at = request_body.get("completed_at")
-
-    query = db.select(Task).where(Task.id == task_id)
-    task = db.session.scalar(query)
-
-    task.title = title
-    task.description = description
-    task.completed_at = completed_at
+    
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+    task.completed_at = request_body.get("completed_at")
 
     db.session.commit()
 
@@ -64,8 +76,7 @@ def update_task(task_id):
 
 @tasks_bp.delete("/<task_id>")
 def delete_task(task_id):
-    query = db.Select(Task).where(Task.id == task_id)
-    task = db.session.scalar(query)
+    task = validate_task(task_id)
 
     db.session.delete(task)
     db.session.commit()
