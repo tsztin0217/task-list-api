@@ -3,7 +3,10 @@ from app.models.task import Task
 from ..db import db
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
-
+# To do:
+# make helper functions:
+# 1: retrieve a model instance by id
+# 2: handle the creation of new instances of a model from a dictionary, return expected response
 
 @tasks_bp.post("")
 def create_task():
@@ -20,3 +23,23 @@ def create_task():
     response = new_task.return_dict()
 
     return response, 201
+
+@tasks_bp.get("")
+def get_all_tasks():
+    query = db.select(Task).order_by(Task.id)
+
+    tasks = db.session.scalars(query)
+
+    tasks_response = [task.return_dict() for task in tasks]
+
+    return tasks_response
+
+@tasks_bp.get("/<task_id>")
+def get_task(task_id):
+    query = db.select(Task).where(Task.id == task_id)
+
+    task = db.session.scalar(query)
+
+    tasks_response = task.return_dict()
+
+    return tasks_response
