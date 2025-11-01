@@ -21,24 +21,15 @@ def validate_task(task_id):
 
     return task
 
-def create_task_from_dict(request_body):
-    title = request_body["title"]
-    description = request_body["description"]
-    completed_at = request_body.get("completed_at")
-
-    new_task = Task(title=title, description=description, completed_at=completed_at)
-
-    return new_task
-
 @tasks_bp.post("")
 def create_task():
     request_body = request.get_json()
-    new_task = create_task_from_dict(request_body)
+    new_task = Task.from_dict(request_body)
 
     db.session.add(new_task)
     db.session.commit()
 
-    response = new_task.return_dict()
+    response = new_task.to_dict()
 
     return response, 201
 
@@ -48,7 +39,7 @@ def get_all_tasks():
 
     tasks = db.session.scalars(query)
 
-    tasks_response = [task.return_dict() for task in tasks]
+    tasks_response = [task.to_dict() for task in tasks]
 
     return tasks_response
 
@@ -56,7 +47,7 @@ def get_all_tasks():
 def get_task(task_id):
     task = validate_task(task_id)
 
-    tasks_response = task.return_dict()
+    tasks_response = task.to_dict()
 
     return tasks_response
 
