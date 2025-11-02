@@ -40,7 +40,13 @@ def create_task():
 
 @tasks_bp.get("")
 def get_all_tasks():
-    query = db.select(Task).order_by(Task.id)
+    query = db.select(Task)
+
+    sort_param = request.args.get("sort")
+    if sort_param == "asc":
+        query = query.order_by(Task.title.asc())
+    elif sort_param == "desc":
+        query = query.order_by(Task.title.desc())
 
     tasks = db.session.scalars(query)
 
