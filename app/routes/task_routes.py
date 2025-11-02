@@ -5,13 +5,13 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 
 def validate_task(task_id):
+    """Retrieves a task by ID or aborts with 400/404."""
     try:
         task_id = int(task_id)
     except:
         response = {"message": f"Task {task_id} invalid"}
-
         abort(make_response(response, 400))
-    
+
     query = db.select(Task).where(Task.id == task_id)
     task = db.session.scalar(query)
 
@@ -23,8 +23,13 @@ def validate_task(task_id):
 
 @tasks_bp.post("")
 def create_task():
+    """Create a task with the data from the request body."""
     request_body = request.get_json()
-    new_task = Task.from_dict(request_body)
+    try:
+        new_task = Task.from_dict(request_body)
+    except:
+        response = {"details": "Invalid data"}
+        abort(make_response(response, 400))
 
     db.session.add(new_task)
     db.session.commit()
