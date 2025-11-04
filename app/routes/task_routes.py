@@ -4,32 +4,17 @@ from ..db import db
 from datetime import datetime
 import requests
 import os
+from .route_utilities import validate_model
 
 path = "https://slack.com/api/chat.postMessage"
 token = os.environ.get("SLACK_API_TOKEN")
 
 
-tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 
-def validate_task(task_id):
-    """Retrieves a task by ID or aborts with 400/404."""
-    try:
-        task_id = int(task_id)
-    except:
-        response = {"message": f"Task {task_id} invalid"}
-        abort(make_response(response, 400))
 
-    query = db.select(Task).where(Task.id == task_id)
-    task = db.session.scalar(query)
-
-    if not task:
-        response = {"message": f"Task {task_id} not found"}
-        abort(make_response(response, 404))
-
-    return task
-
-@tasks_bp.post("")
+@bp.post("")
 def create_task():
     """Create a task with the data from the request body."""
     request_body = request.get_json()
@@ -46,7 +31,7 @@ def create_task():
 
     return response, 201
 
-@tasks_bp.get("")
+@bp.get("")
 def get_all_tasks():
     query = db.select(Task)
 
@@ -62,17 +47,17 @@ def get_all_tasks():
 
     return tasks_response
 
-@tasks_bp.get("/<task_id>")
+@bp.get("/<task_id>")
 def get_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     tasks_response = task.to_dict()
 
     return tasks_response
 
-@tasks_bp.put("/<task_id>")
+@bp.put("/<task_id>")
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     request_body = request.get_json()
     
@@ -84,9 +69,9 @@ def update_task(task_id):
 
     return Response(status=204, mimetype="application/json")
 
-@tasks_bp.patch("/<task_id>/mark_complete")
+@bp.patch("/<task_id>/mark_complete")
 def mark_task_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     task.completed_at = datetime.now()
     db.session.commit()
 
@@ -101,17 +86,17 @@ def mark_task_complete(task_id):
 
     return Response(status=204, mimetype="application/json")
 
-@tasks_bp.patch("/<task_id>/mark_incomplete")
+@bp.patch("/<task_id>/mark_incomplete")
 def mark_task_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     task.completed_at = None
     db.session.commit() 
 
     return Response(status=204, mimetype="application/json")
 
-@tasks_bp.delete("/<task_id>")
+@bp.delete("/<task_id>")
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
