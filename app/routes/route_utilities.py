@@ -32,3 +32,22 @@ def create_model(cls, model_data):
     response = new_model.to_dict()
 
     return response, 201
+
+def get_models_with_filters(cls, filters=None, sort_param=None):
+    """Retrieve all model instances, optionally applying filters."""
+    query = db.select(cls)
+
+    if filters:
+        for attribute, value in filters.items():
+            query = query.where(getattr(cls, attribute) == value)
+
+    if sort_param == "asc":
+        query = query.order_by(cls.title.asc())
+    elif sort_param == "desc":
+        query = query.order_by(cls.title.desc())
+
+    models = db.session.scalars(query)
+
+    response = [model.to_dict() for model in models]
+
+    return response

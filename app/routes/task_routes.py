@@ -4,7 +4,7 @@ from ..db import db
 from datetime import datetime
 import requests
 import os
-from .route_utilities import validate_model
+from .route_utilities import validate_model, create_model, get_models_with_filters
 
 path = "https://slack.com/api/chat.postMessage"
 token = os.environ.get("SLACK_API_TOKEN")
@@ -18,34 +18,12 @@ bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 def create_task():
     """Create a task with the data from the request body."""
     request_body = request.get_json()
-    try:
-        new_task = Task.from_dict(request_body)
-    except:
-        response = {"details": "Invalid data"}
-        abort(make_response(response, 400))
-
-    db.session.add(new_task)
-    db.session.commit()
-
-    response = new_task.to_dict()
-
-    return response, 201
+    return create_model(Task, request_body)
 
 @bp.get("")
 def get_all_tasks():
-    query = db.select(Task)
-
-    sort_param = request.args.get("sort")
-    if sort_param == "asc":
-        query = query.order_by(Task.title.asc())
-    elif sort_param == "desc":
-        query = query.order_by(Task.title.desc())
-
-    tasks = db.session.scalars(query)
-
-    response = [task.to_dict() for task in tasks]
-
-    return response
+    return get_models_with_filters(Task, 
+                                   sort_param=request.args.get("sort"))
 
 @bp.get("/<task_id>")
 def get_task(task_id):

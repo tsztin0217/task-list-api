@@ -4,7 +4,7 @@ from app.models.goal import Goal
 from app.models.task import Task
 from app.routes.route_utilities import create_model, validate_model
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_route_utilities_validate_model_with_task(client, three_tasks):
     #Act
     task_1 = validate_model(Task, 1)
@@ -53,7 +53,7 @@ def test_route_utilities_validate_model_with_task_missing_id(client, three_tasks
     # *****************************************************************************
 
     
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_route_utilities_validate_model_with_goal(client, one_goal):
     #Act
     goal_1 = validate_model(Goal, 1)
@@ -84,7 +84,7 @@ def test_route_utilities_validate_model_with_goal_missing_id(client, one_goal):
     # **Complete test with assertion about status code response body***************
     # *****************************************************************************
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_route_utilities_create_model_with_task(client):
     #Arrange
     request_body = {
@@ -103,7 +103,7 @@ def test_route_utilities_create_model_with_task(client):
     assert response[0]["is_complete"] == False
     assert response[1] == 201
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_route_utilities_create_model_with_task_missing_title(client):
     #Arrange
     request_body = {
@@ -120,7 +120,7 @@ def test_route_utilities_create_model_with_task_missing_title(client):
     assert response.get_json() == {"details": "Invalid data"}
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_route_utilities_create_model_with_goal(client):
     #Arrange
     request_body = {
