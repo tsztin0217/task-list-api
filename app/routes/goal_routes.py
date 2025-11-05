@@ -16,10 +16,18 @@ def get_all_goals():
 
     goals = db.session.scalars(query)
 
-    goals_response = [goal.to_dict() for goal in goals]
+    response = [goal.to_dict() for goal in goals]
 
-    return goals_response
+    return response
 
+@bp.get("/<goal_id>")
+def get_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    
+    response = goal.to_dict()
+
+    return response
+    
 
 @bp.put("/<goal_id>")
 def update_goal(goal_id):
@@ -33,4 +41,12 @@ def update_goal(goal_id):
 
     return Response(status=204, mimetype="application/json")
 
+@bp.delete("/<goal_id>")
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
 

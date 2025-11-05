@@ -43,17 +43,17 @@ def get_all_tasks():
 
     tasks = db.session.scalars(query)
 
-    tasks_response = [task.to_dict() for task in tasks]
+    response = [task.to_dict() for task in tasks]
 
-    return tasks_response
+    return response
 
 @bp.get("/<task_id>")
 def get_task(task_id):
     task = validate_model(Task, task_id)
 
-    tasks_response = task.to_dict()
+    response = task.to_dict()
 
-    return tasks_response
+    return response
 
 @bp.put("/<task_id>")
 def update_task(task_id):
