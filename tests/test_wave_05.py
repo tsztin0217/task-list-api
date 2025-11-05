@@ -134,7 +134,7 @@ def test_create_goal(client):
     response_body = response.get_json()
 
     # Assert
-    assert response.status_code == 204
+    assert response.status_code == 201
     assert response_body == {
         "id": 1,
         "title": "My New Goal"

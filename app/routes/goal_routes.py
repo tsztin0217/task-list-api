@@ -60,12 +60,17 @@ def create_tasks_for_goal(goal_id):
 
     # get list of task ids from dictionary
     task_ids = request_body.get("task_ids", [])
+
+    for task in goal.tasks:
+        task.goal = None
+        task.goal_id = None
     
     # associate each task with the goal
     for task_id in task_ids:
         task = validate_model(Task, task_id)
         task.goal = goal
         task.goal_id = goal.id
+    
 
     # commit the changes to the database
     db.session.commit()
@@ -77,3 +82,8 @@ def create_tasks_for_goal(goal_id):
     }
 
     return response, 200
+
+@bp.get("/goal_id>/tasks")
+def get_tasks_of_one_goal(goal_id):
+    goal = validate_model(goal_id)
+
