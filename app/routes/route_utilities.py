@@ -33,18 +33,28 @@ def create_model(cls, model_data):
 
     return response, 201
 
-def get_models_with_filters(cls, filters=None, sort_param=None):
-    """Retrieve all model instances, optionally applying filters."""
+def get_models_with_filters(cls, sort=None, title=None, description=None):
+    """Return list of model dicts, optionally sorted and filtered.
+
+    If the requested filter/sort field doesn't exist on `cls`, the function will
+    ignore that filter/sort and return unfiltered/unordered results (i.e. "just return all").
+    """
     query = db.select(cls)
 
-    if filters:
-        for attribute, value in filters.items():
-            if hasattr(cls, attribute):
-                query = query.where(getattr(cls, attribute).ilike(f"%{value}%"))
+    # Apply filter using getattr; if the attribute doesn't exist, ignore the filter
+    if title:
+        attr = getattr(cls, "title", None)
+        if attr is not None:
+            query = query.where(attr.ilike(f"%{title}%"))
+    
+    if description:
+        attr = getattr(cls, "description", None)
+        if attr is not None:
+            query = query.where(attr.ilike(f"%{description}%"))
 
-    if sort_param == "asc":
+    if sort == "asc":
         query = query.order_by(cls.title.asc())
-    elif sort_param == "desc":
+    else:
         query = query.order_by(cls.title.desc())
 
     models = db.session.scalars(query)

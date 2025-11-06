@@ -23,8 +23,10 @@ def create_task():
 @bp.get("")
 def get_all_tasks():
     return get_models_with_filters(Task, 
-                                   sort_param=request.args.get("sort"),
-                                   filters=request.args.get("filters"))
+                                   sort=request.args.get("sort"),
+                                   title=request.args.get("title"),
+                                   description=request.args.get("description"))
+
 
 @bp.get("/<task_id>")
 def get_task(task_id):

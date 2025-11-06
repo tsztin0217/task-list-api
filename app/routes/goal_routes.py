@@ -14,8 +14,9 @@ def create_goal():
 @bp.get("")
 def get_all_goals():
     return get_models_with_filters(Goal, 
-                                   sort_param=request.args.get("sort"),
-                                   filters=request.args.get("filters"))
+                                   sort=request.args.get("sort"),
+                                   title=request.args.get("title"),
+                                   description=request.args.get("description"))
 
 @bp.get("/<goal_id>")
 def get_goal(goal_id):
