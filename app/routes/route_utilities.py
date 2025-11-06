@@ -39,7 +39,8 @@ def get_models_with_filters(cls, filters=None, sort_param=None):
 
     if filters:
         for attribute, value in filters.items():
-            query = query.where(getattr(cls, attribute) == value)
+            if hasattr(cls, attribute):
+                query = query.where(getattr(cls, attribute).ilike(f"%{value}%"))
 
     if sort_param == "asc":
         query = query.order_by(cls.title.asc())

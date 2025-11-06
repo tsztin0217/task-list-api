@@ -13,13 +13,9 @@ def create_goal():
 
 @bp.get("")
 def get_all_goals():
-    query = db.select(Goal).order_by(Goal.id)
-
-    goals = db.session.scalars(query)
-
-    response = [goal.to_dict() for goal in goals]
-
-    return response
+    return get_models_with_filters(Goal, 
+                                   sort_param=request.args.get("sort"),
+                                   filters=request.args.get("filters"))
 
 @bp.get("/<goal_id>")
 def get_goal(goal_id):
