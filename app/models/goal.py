@@ -18,9 +18,14 @@ class Goal(db.Model):
             title=goal_dict["title"]
         )
     
-    def to_dict(self):
+    def to_dict(self, with_tasks=False):
         """Return a dictionary representation of the Goal."""
-        return {
+        goal_dict = {
             "id": self.id,
             "title": self.title
         }
+        
+        if with_tasks:
+            goal_dict["tasks"] = [task.to_dict() for task in self.tasks]
+        
+        return goal_dict

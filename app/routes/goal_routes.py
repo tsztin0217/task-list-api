@@ -82,12 +82,7 @@ def create_tasks_for_goal(goal_id):
 @bp.get("/<goal_id>/tasks")
 def get_tasks_of_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
-    tasks = [task.to_dict() for task in goal.tasks]
-
-    response = {
-        "id": goal.id,
-        "title": goal.title,
-        "tasks": tasks
-    }
+    
+    response = goal.to_dict(with_tasks=True)
 
     return response, 200
