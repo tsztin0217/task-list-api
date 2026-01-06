@@ -1,5 +1,7 @@
 from flask import abort, make_response
 from ..db import db
+import requests
+import os
 
 def validate_model(cls, model_id):
     """Retrieves a model instance by ID or aborts with 400/404."""
@@ -62,3 +64,20 @@ def get_models_with_filters(cls, sort=None, title=None, description=None):
     response = [model.to_dict() for model in models]
 
     return response
+
+
+def send_slack_notification(message):
+    """Send a notification message to Slack."""
+    slack_token = os.environ.get("SLACK_API_TOKEN")
+    channel = os.environ.get("SLACK_CHANNEL_ID", "#test-slack-api")
+    
+    headers = {
+        "Authorization": f"Bearer {slack_token}"
+    }
+    
+    data = {
+        "channel": channel,
+        "text": message
+    }
+    
+    requests.post("https://slack.com/api/chat.postMessage", headers=headers, json=data)
